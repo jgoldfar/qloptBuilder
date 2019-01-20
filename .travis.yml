@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for jgoldfar/qloptBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: cPpG0yVU5rbgt+Bvb4BQzTrXh13wTOSebE6gB9iiMuYBs2Dx3Y6irEyDanQCMbFEo8JINHOvQ3m7ezC9iFev14OlZeQnz+gHvjF5CL8iiFcSknm/8nkjeWkYRtaduFMJW2s6EEk40dD99HcRwPsm82ATHVf/kpwLS5njyjfgv52DPQCJEyri9ZEZ7IaB7l1E1uKHize8FU9+A24WOe6h+6iy8U8H2ucn9Xfc9/nNHFIMf011JTjF8m3OGLK/UqEofCkwSQfzPURyaaAI60Hfmr4YwIB3F0ljO26jZft5Z2dNob4kb21GYY8v/GxJT4W5916Wwd1K/JtBnfBtAR7fKm14iat2hcjoXko+enaZZiF6YQvemW7/vI+VbuSCRa1An53iTX4RHTNkIuxQqxHPR/IbsYmHR43fNcyyHYS3ZqbUwGCGKpzvdpEzqBelUH3j5gC2Z21usT2K5MZG+UxNhnBpZ/PFIxH2acxQNPjwpCn+vUBk9pekXkSBOONjbHYZNWm5cVdypKO2CvaowV5Nur6PTt4B3MSJH2aGREVWFZY0YGmOoqnYSJebyLQSNYsGkTdx3pvyo/Up1dvyiQVekiAEfZrLnhQmJVykrKZoQGGqYmGnXSdEi0+9av3ufl0SkUONBPN+c8FCvqhenpMtkFQqbpwMn8Y2lqaY3vsxE3g=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: jgoldfar/qloptBuilder
+        tags: true
